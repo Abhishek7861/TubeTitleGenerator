@@ -1,5 +1,6 @@
 package com.example.TubeTitleGenerator.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -17,6 +18,10 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Value("${app.frontend-url:http://localhost:5174}")
+    private String frontendUrl;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)
     {
@@ -34,14 +39,14 @@ public class SecurityConfig {
                 )
                 .oauth2Login(oauth -> oauth
                         .defaultSuccessUrl(
-                                "http://localhost:5174/dashboard",
+                                frontendUrl + "/dashboard",
                                 true
                         )
                 )
 
                 .logout(logout -> logout
                         .logoutSuccessUrl(
-                                "http://localhost:5174/login"
+                                frontendUrl + "/login"
                         ).clearAuthentication(true)
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
@@ -56,7 +61,7 @@ public class SecurityConfig {
                 new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of("http://localhost:5174")
+                List.of(frontendUrl)
         );
 
         configuration.setAllowedMethods(
