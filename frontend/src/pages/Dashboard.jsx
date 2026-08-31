@@ -161,6 +161,40 @@ function Dashboard() {
     );
 }
 
+/* ---------- Result Loader ---------- */
+
+const LOADER_MESSAGES = [
+    "Analyzing your topic...",
+    "Crafting catchy titles...",
+    "Writing SEO description...",
+    "Picking the best tags & hashtags...",
+    "Almost there — polishing results..."
+];
+
+function ResultLoader() {
+
+    const [messageIndex, setMessageIndex] = useState(0);
+
+    useEffect(() => {
+        const id = setInterval(() => {
+            setMessageIndex((i) => (i + 1) % LOADER_MESSAGES.length);
+        }, 3500);
+        return () => clearInterval(id);
+    }, []);
+
+    return (
+        <div className="result-loader">
+            <div className="loader-spinner" />
+            <div className="loader-message">
+                {LOADER_MESSAGES[messageIndex]}
+            </div>
+            <div className="loader-hint">
+                This usually takes 15–20 seconds.
+            </div>
+        </div>
+    );
+}
+
 /* ---------- Title & Description Generator ---------- */
 
 function TitleGeneratorView() {
@@ -340,7 +374,14 @@ function TitleGeneratorView() {
                         type="submit"
                         disabled={loading}
                     >
-                        {loading ? "Generating..." : "Generate"}
+                        {loading ? (
+                            <>
+                                <span className="btn-spinner" />
+                                Generating...
+                            </>
+                        ) : (
+                            "Generate"
+                        )}
                     </button>
 
                 </form>
@@ -358,11 +399,7 @@ function TitleGeneratorView() {
                     </p>
                 )}
 
-                {loading && (
-                    <p className="empty">
-                        Generating suggestions...
-                    </p>
-                )}
+                {loading && <ResultLoader />}
 
                 {result && (
                     <div className="results">
