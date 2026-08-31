@@ -1,10 +1,11 @@
 import "./Login.css";
+import { API_URL } from "../config";
 
 function Login() {
 
     const handleGoogleLogin = () => {
         window.location.href =
-            "http://localhost:8080/oauth2/authorization/google";
+            `${API_URL}/oauth2/authorization/google`;
     };
 
     return (

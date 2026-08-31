@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./Dashboard.css";
+import { API_URL } from "../config";
 
 function Dashboard() {
 
@@ -10,7 +11,7 @@ function Dashboard() {
 
         try {
 
-            await fetch("http://localhost:8080/logout", {
+            await fetch(`${API_URL}/logout`, {
                 method: "POST",
                 credentials: "include"
             });
@@ -27,7 +28,7 @@ function Dashboard() {
 
     useEffect(() => {
 
-        fetch("http://localhost:8080/api/me", {
+        fetch(`${API_URL}/api/me`, {
             credentials: "include"
         })
             .then(response => {
@@ -211,7 +212,7 @@ function TitleGeneratorView() {
         try {
 
             const response = await fetch(
-                "http://localhost:8080/api/generate",
+                `${API_URL}/api/generate`,
                 {
                     method: "POST",
                     credentials: "include",
