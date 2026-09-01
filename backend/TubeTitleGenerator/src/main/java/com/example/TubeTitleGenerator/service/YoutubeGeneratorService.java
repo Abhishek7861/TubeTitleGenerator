@@ -15,18 +15,14 @@ public class YoutubeGeneratorService {
     private final AiProviderFactory providerFactory;
 
     private final AiProviderType defaultProvider;
-
     public YoutubeGeneratorService(
             AiProviderFactory providerFactory,
-
             @Value("${ai.provider}")
-            AiProviderType defaultProvider) {
+            AiProviderType defaultProvider,
+            ImageKitService imageKitService) {
 
-        this.providerFactory =
-                providerFactory;
-
-        this.defaultProvider =
-                defaultProvider;
+        this.providerFactory = providerFactory;
+        this.defaultProvider = defaultProvider;
     }
 
     public GenerateResponse generate(

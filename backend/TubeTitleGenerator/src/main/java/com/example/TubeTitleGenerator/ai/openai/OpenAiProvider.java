@@ -7,6 +7,7 @@ import com.example.TubeTitleGenerator.dto.GenerateRequest;
 import com.example.TubeTitleGenerator.dto.GenerateResponse;
 import com.example.TubeTitleGenerator.dto.ThumbnailRequest;
 import com.example.TubeTitleGenerator.dto.ThumbnailResponse;
+import com.example.TubeTitleGenerator.service.ImageKitService;
 import com.example.TubeTitleGenerator.util.ManageImage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +27,7 @@ public class OpenAiProvider extends AbstractAiProvider {
 
     private final WebClient openAIWebClient;
     private final ObjectMapper objectMapper;
+    private final ImageKitService imageKitService;
 
     @Value("${openai.model}")
     private String model;
@@ -32,7 +35,7 @@ public class OpenAiProvider extends AbstractAiProvider {
     @Value("${openai.image-model}")
     private String imageModel;
 
-    @Value("${openai.image-size:1536x1024}")
+    @Value("${openai.image-size:1920 × 1080}")
     private String imageSize;
 
     @Override
@@ -133,7 +136,10 @@ public class OpenAiProvider extends AbstractAiProvider {
                                 + rawResponse
                 );
             }
-            imageUrl = ManageImage.saveImageLocally(b64);
+            String fileName = "thumbnail-"
+                    + System.currentTimeMillis() + ".png";
+            byte[] pngBytes = java.util.Base64.getDecoder().decode(b64);
+            imageUrl = imageKitService.uploadImage(pngBytes, fileName);
         }
 
         ThumbnailResponse result = new ThumbnailResponse();
