@@ -1,14 +1,10 @@
 package com.example.TubeTitleGenerator.service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public final class YoutubePrompt {
     private YoutubePrompt() {
     }
 
-    public static String build(
+    public static String buildTitlePrompt(
             String topic,
             String audience,
             String language,
@@ -58,5 +54,40 @@ public final class YoutubePrompt {
                 keywords,
                 tone
         );
+    }
+
+    public static String buildThumbnailPrompt(
+            String topic,
+            String style) {
+
+        return """
+        Create a highly clickable YouTube thumbnail.
+
+        Video topic:
+        %s
+
+        Style:
+        %s
+
+        Requirements:
+
+        - Designed specifically for YouTube
+        - 16:9 landscape composition
+        - Strong visual hierarchy
+        - One clear focal point
+        - High contrast
+        - Visually compelling
+        - Professional creator-quality design
+        - Easy to understand on a mobile screen
+        - Minimal clutter
+        - No watermark
+        - No unnecessary small text
+
+        The thumbnail should communicate the topic immediately
+        without requiring the viewer to read a long sentence.
+
+        Use bold visual storytelling appropriate for the topic.
+        """
+                .formatted(topic, style);
     }
 }

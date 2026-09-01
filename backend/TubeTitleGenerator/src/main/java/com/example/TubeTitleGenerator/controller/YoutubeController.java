@@ -2,6 +2,8 @@ package com.example.TubeTitleGenerator.controller;
 
 import com.example.TubeTitleGenerator.dto.GenerateRequest;
 import com.example.TubeTitleGenerator.dto.GenerateResponse;
+import com.example.TubeTitleGenerator.dto.ThumbnailRequest;
+import com.example.TubeTitleGenerator.dto.ThumbnailResponse;
 import com.example.TubeTitleGenerator.service.YoutubeGeneratorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -32,4 +34,10 @@ public class YoutubeController {
                 "email", user.getAttribute("email"),
                 "picture", user.getAttribute("picture")
         );    }
+
+    @PostMapping("/generate-thumbnail")
+    public ThumbnailResponse generateThumbnail(
+            @RequestBody ThumbnailRequest request) throws Exception {
+        return service.generateThumbnail(request);
+    }
 }

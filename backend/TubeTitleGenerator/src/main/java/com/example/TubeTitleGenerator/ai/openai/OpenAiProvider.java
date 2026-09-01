@@ -5,7 +5,9 @@ import com.example.TubeTitleGenerator.ai.AiProviderType;
 import com.example.TubeTitleGenerator.ai.YouTubeMetadataSchema;
 import com.example.TubeTitleGenerator.dto.GenerateRequest;
 import com.example.TubeTitleGenerator.dto.GenerateResponse;
-import com.example.TubeTitleGenerator.service.YoutubePrompt;
+import com.example.TubeTitleGenerator.dto.ThumbnailRequest;
+import com.example.TubeTitleGenerator.dto.ThumbnailResponse;
+import com.example.TubeTitleGenerator.util.ManageImage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -26,6 +28,12 @@ public class OpenAiProvider extends AbstractAiProvider {
 
     @Value("${openai.model}")
     private String model;
+
+    @Value("${openai.image-model}")
+    private String imageModel;
+
+    @Value("${openai.image-size:1536x1024}")
+    private String imageSize;
 
     @Override
     public GenerateResponse generate(
@@ -72,6 +80,64 @@ public class OpenAiProvider extends AbstractAiProvider {
                         GenerateResponse.class
                 );
 
+        return result;
+    }
+
+    @Override
+    public ThumbnailResponse generateThumbnail(ThumbnailRequest request) throws Exception {
+
+        String prompt = buildThumbnailPrompt(request);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("model", imageModel);
+        body.put("prompt", prompt);
+        body.put("n", 1);
+        body.put("size", imageSize);
+
+        String rawResponse;
+        try {
+            rawResponse =
+                    openAIWebClient
+                            .post()
+                            .uri("/images/generations")
+                            .bodyValue(body)
+                            .retrieve()
+                            .bodyToMono(String.class)
+                            .block();
+        } catch (org.springframework.web.reactive.function.client.WebClientResponseException e) {
+            throw new IllegalStateException(
+                    "OpenAI image API " + e.getStatusCode()
+                            + " — request body: " + body
+                            + " — response body: " + e.getResponseBodyAsString(),
+                    e
+            );
+        }
+
+        JsonNode root = objectMapper.readTree(rawResponse);
+        JsonNode data = root.path("data");
+
+        if (!data.isArray() || data.isEmpty()) {
+            throw new IllegalStateException(
+                    "OpenAI image response missing 'data' array. Raw: " + rawResponse
+            );
+        }
+
+        JsonNode first = data.get(0);
+        String imageUrl = first.path("url").asText(null);
+
+        if (imageUrl == null || imageUrl.isBlank()) {
+            String b64 = first.path("b64_json").asText(null);
+            if (b64 == null || b64.isBlank()) {
+                throw new IllegalStateException(
+                        "OpenAI image response missing both 'url' and 'b64_json'. Raw: "
+                                + rawResponse
+                );
+            }
+            imageUrl = ManageImage.saveImageLocally(b64);
+        }
+
+        ThumbnailResponse result = new ThumbnailResponse();
+        result.setImageUrl(imageUrl);
         return result;
     }
 

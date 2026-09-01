@@ -4,17 +4,11 @@ import com.example.TubeTitleGenerator.ai.AbstractAiProvider;
 import com.example.TubeTitleGenerator.ai.AiProviderType;
 import com.example.TubeTitleGenerator.dto.GenerateRequest;
 import com.example.TubeTitleGenerator.dto.GenerateResponse;
-import lombok.RequiredArgsConstructor;
+import com.example.TubeTitleGenerator.dto.ThumbnailRequest;
+import com.example.TubeTitleGenerator.dto.ThumbnailResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class YoutubeGeneratorService {
@@ -50,5 +44,21 @@ public class YoutubeGeneratorService {
                 );
 
         return provider.generate(request);
+    }
+
+    public ThumbnailResponse generateThumbnail(
+            ThumbnailRequest request) throws Exception {
+
+        AiProviderType providerType =
+                request.getProvider() != null
+                        ? request.getProvider()
+                        : defaultProvider;
+
+        AbstractAiProvider provider =
+                providerFactory.getProvider(
+                        providerType
+                );
+        return provider.generateThumbnail(request);
+
     }
 }

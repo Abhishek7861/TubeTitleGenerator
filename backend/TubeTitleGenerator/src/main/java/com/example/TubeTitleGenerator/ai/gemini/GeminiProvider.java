@@ -4,6 +4,8 @@ import com.example.TubeTitleGenerator.ai.AbstractAiProvider;
 import com.example.TubeTitleGenerator.ai.AiProviderType;
 import com.example.TubeTitleGenerator.dto.GenerateRequest;
 import com.example.TubeTitleGenerator.dto.GenerateResponse;
+import com.example.TubeTitleGenerator.dto.ThumbnailRequest;
+import com.example.TubeTitleGenerator.dto.ThumbnailResponse;
 import com.example.TubeTitleGenerator.service.YoutubePrompt;
 import com.google.genai.Client;
 import com.google.genai.gaos.models.interactions.CreateModelInteraction;
@@ -37,7 +39,7 @@ public class GeminiProvider extends AbstractAiProvider {
     @Override
     public GenerateResponse generate(GenerateRequest request) throws Exception {
         String prompt =
-                YoutubePrompt.build(
+                YoutubePrompt.buildTitlePrompt(
                         request.getTopic(),
                         request.getAudience(),
                         request.getLanguage(),
@@ -66,6 +68,11 @@ public class GeminiProvider extends AbstractAiProvider {
                                         "Gemini returned empty output"));
 
         return parseResponse(json);
+    }
+
+    @Override
+    public ThumbnailResponse generateThumbnail(ThumbnailRequest request) throws Exception {
+        return null;
     }
 
     @Override
